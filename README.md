@@ -12,9 +12,13 @@
 
 ## 自行编译
 
+* 安装Node.js
+  1. 命令行 `curl -sL https://rpm.nodesource.com/setup_10.x | sudo bash -`
+  2. 命令行 `yum install nodejs`
+
 * 第一次使用
   1. 安装[Git](https://git-scm.com/downloads)
-  2. 安装[Node.js](https://nodejs.org/)
+  2. 安装Node.js，见上文
   3. 命令行 `git clone https://github.com/Blokura/bilive_server.git`
   4. 命令行 `cd bilive_server`
   5. 命令行 `mkdir options`
