@@ -346,7 +346,7 @@ class RoomListener extends EventEmitter {
       roomID: dataJson._roomid,
       id: +dataJson.data.id,
       award_num: +dataJson.data.award_num,
-      award_name: dataJson.data.id,
+      award_name: dataJson.data.award_name,
       danmu: dataJson.data.danmu,
       gift_id: +dataJson.data.gift_id,
       gift_name: dataJson.data.gift_name,
