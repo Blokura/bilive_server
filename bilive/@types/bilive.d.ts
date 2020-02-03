@@ -46,6 +46,7 @@ interface userData {
   lottery: boolean
   pklottery: boolean
   beatStorm: boolean
+  anchor: boolean
 }
 interface optionsInfo {
   [index: string]: configInfoData
@@ -63,6 +64,7 @@ interface optionsInfo {
   lottery: configInfoData
   pklottery: configInfoData
   beatStorm: configInfoData
+  anchor: configInfoData
 }
 interface configInfoData {
   description: string
@@ -361,6 +363,28 @@ interface beatStormMessage {
 /**
  * 消息格式
  *
+ * @interface beatStormMessage
+ */
+interface anchorMessage {
+  cmd: 'anchor'
+  roomID: number
+  id: number
+  award_num: number
+  award_name: string
+  danmu: string
+  gift_id: number
+  gift_name: string
+  gift_num: number
+  gift_price: number
+  require_type: number
+  require_value: number
+  type: string
+  title: string
+  time: number
+}
+/**
+ * 消息格式
+ *
  * @interface systemMessage
  */
 interface systemMessage {
@@ -451,6 +475,32 @@ interface lotteryInfoDataStorm {
   content: string
   hadJoin: number
   storm_gif: string
+}
+interface lotteryInfoDataAnchor {
+  asset_icon: string
+  award_image: string
+  award_name: string
+  award_num: number
+  cur_gift_num: number
+  current_time: number
+  danmu: string
+  gift_id: number
+  gift_name: string
+  gift_num: number
+  gift_price: number
+  goaway_time: number
+  id: number
+  join_type: number
+  lot_status: number
+  max_time:number
+  require_text: string
+  require_type: number
+  require_value: number
+  room_id: number
+  show_panel: number
+  status: number
+  time: number
+  url: string
 }
 /**
  * 获取直播列表

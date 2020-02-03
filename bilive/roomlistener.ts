@@ -53,7 +53,7 @@ class RoomListener extends EventEmitter {
   }
   /**
    * 全站开播房间监听-刷新
-   * 
+   *
    * @public
    */
   public async _RefreshLiveRoomListener() {
@@ -65,8 +65,8 @@ class RoomListener extends EventEmitter {
       const len = this.liveRoomList.size
       this.liveRoomList.forEach(async (commentClient, roomID) => {
         commentClient
-          .removeAllListeners()
-          .Close()
+            .removeAllListeners()
+            .Close()
         this.liveRoomList.delete(roomID)
       })
       tools.Log(`已断开与 ${len} 个开播房间的连接`)
@@ -91,8 +91,8 @@ class RoomListener extends EventEmitter {
       this.roomList.forEach(async (commentClient, roomID) => {
         if (liveList.has(roomID)) return
         commentClient
-          .removeAllListeners()
-          .Close()
+            .removeAllListeners()
+            .Close()
         this.roomList.delete(roomID)
       })
       tools.Log(`已连接到数据库中的 ${roomList.length} 个房间`)
@@ -100,7 +100,7 @@ class RoomListener extends EventEmitter {
   }
   /**
    * 添加已开播房间
-   * 
+   *
    * @private
    * @memberof RoomListener
    */
@@ -134,8 +134,8 @@ class RoomListener extends EventEmitter {
     this.liveRoomList.forEach(async (commentClient, roomID) => {
       if (roomSet.has(roomID)) return
       commentClient
-        .removeAllListeners()
-        .Close()
+          .removeAllListeners()
+          .Close()
       this.liveRoomList.delete(roomID)
     })
     tools.Log(`已连接到 ${liveNumber} 个开播房间中的 ${connectNumber} 个`)
@@ -152,14 +152,14 @@ class RoomListener extends EventEmitter {
     clearInterval(this._LiveRoomRefreshTimer)
     this.roomList.forEach(async (commentClient, roomID) => {
       commentClient
-        .removeAllListeners()
-        .Close()
+          .removeAllListeners()
+          .Close()
       this.roomList.delete(roomID)
     })
     this.liveRoomList.forEach(async (commentClient, roomID) => {
       commentClient
-        .removeAllListeners()
-        .Close()
+          .removeAllListeners()
+          .Close()
       this.liveRoomList.delete(roomID)
     })
     await this.Start()
@@ -176,23 +176,24 @@ class RoomListener extends EventEmitter {
     if (userID === 0) userID = await this._getMasterID(roomID)
     const commentClient = new DMclient({ roomID, userID, protocol: 'flash' })
     commentClient
-      .on('SYS_MSG', dataJson => this.emit('SYS_MSG', dataJson))
-      .on('SYS_GIFT', dataJson => this.emit('SYS_GIFT', dataJson))
-      .on('TV_START', dataJson => this._RaffleStartHandler(dataJson))
-      .on('RAFFLE_START', dataJson => this._RaffleStartHandler(dataJson))
-      .on('LOTTERY_START', dataJson => this._LotteryStartHandler(dataJson))
-      .on('PK_LOTTERY_START', dataJson => this._PKLotteryStartHandler(dataJson))
-      .on('GUARD_LOTTERY_START', dataJson => this._LotteryStartHandler(dataJson))
-      .on('SPECIAL_GIFT', dataJson => this._SpecialGiftHandler(dataJson))
-      .on('ALL_MSG', dataJson => {
-        if (!Options._.config.excludeCMD.includes(dataJson.cmd)) {
-          Options._.config.excludeCMD.push(dataJson.cmd)
-          tools.Log(JSON.stringify(dataJson))
-          DanmuLib.add(dataJson)
-        }
-      })
-      .on('DMerror', () => this._DMErrorCount++)
-      .Connect({ server: 'broadcastlv.chat.bilibili.com', port: 2243 })
+        .on('SYS_MSG', dataJson => this.emit('SYS_MSG', dataJson))
+        .on('SYS_GIFT', dataJson => this.emit('SYS_GIFT', dataJson))
+        .on('TV_START', dataJson => this._RaffleStartHandler(dataJson))
+        .on('RAFFLE_START', dataJson => this._RaffleStartHandler(dataJson))
+        .on('LOTTERY_START', dataJson => this._LotteryStartHandler(dataJson))
+        .on('PK_LOTTERY_START', dataJson => this._PKLotteryStartHandler(dataJson))
+        .on('GUARD_LOTTERY_START', dataJson => this._LotteryStartHandler(dataJson))
+        .on('SPECIAL_GIFT', dataJson => this._SpecialGiftHandler(dataJson))
+        .on('ANCHOR_LOT_START', dataJson => this._AnchorLotStartHandler(dataJson))
+        .on('ALL_MSG', dataJson => {
+          if (!Options._.config.excludeCMD.includes(dataJson.cmd)) {
+            Options._.config.excludeCMD.push(dataJson.cmd)
+            tools.Log(JSON.stringify(dataJson))
+            DanmuLib.add(dataJson)
+          }
+        })
+        .on('DMerror', () => this._DMErrorCount++)
+        .Connect({ server: 'broadcastlv.chat.bilibili.com', port: 2243 })
     this.roomList.set(roomID, commentClient)
   }
   /**
@@ -207,23 +208,24 @@ class RoomListener extends EventEmitter {
     if (userID === 0) userID = await this._getMasterID(roomID)
     const commentClient = new DMclient({ roomID, userID, protocol: 'flash' })
     commentClient
-      .on('SYS_MSG', dataJson => this.emit('SYS_MSG', dataJson))
-      .on('SYS_GIFT', dataJson => this.emit('SYS_GIFT', dataJson))
-      .on('TV_START', dataJson => this._RaffleStartHandler(dataJson))
-      .on('RAFFLE_START', dataJson => this._RaffleStartHandler(dataJson))
-      .on('LOTTERY_START', dataJson => this._LotteryStartHandler(dataJson, '2'))
-      .on('PK_LOTTERY_START', dataJson => this._PKLotteryStartHandler(dataJson, '2'))
-      .on('GUARD_LOTTERY_START', dataJson => this._LotteryStartHandler(dataJson, '2'))
-      .on('SPECIAL_GIFT', dataJson => this._SpecialGiftHandler(dataJson, '2'))
-      .on('ALL_MSG', dataJson => {
-        if (!Options._.config.excludeCMD.includes(dataJson.cmd)) {
-          Options._.config.excludeCMD.push(dataJson.cmd)
-          tools.Log(JSON.stringify(dataJson))
-          DanmuLib.add(dataJson)
-        }
-      })
-      .on('DMerror', () => this._DMErrorCount++)
-      .Connect({ server: 'broadcastlv.chat.bilibili.com', port: 2243 })
+        .on('SYS_MSG', dataJson => this.emit('SYS_MSG', dataJson))
+        .on('SYS_GIFT', dataJson => this.emit('SYS_GIFT', dataJson))
+        .on('TV_START', dataJson => this._RaffleStartHandler(dataJson))
+        .on('RAFFLE_START', dataJson => this._RaffleStartHandler(dataJson))
+        .on('LOTTERY_START', dataJson => this._LotteryStartHandler(dataJson, '2'))
+        .on('PK_LOTTERY_START', dataJson => this._PKLotteryStartHandler(dataJson, '2'))
+        .on('GUARD_LOTTERY_START', dataJson => this._LotteryStartHandler(dataJson, '2'))
+        .on('SPECIAL_GIFT', dataJson => this._SpecialGiftHandler(dataJson, '2'))
+        .on('ANCHOR_LOT_START', dataJson => this._AnchorLotStartHandler(dataJson, '2'))
+        .on('ALL_MSG', dataJson => {
+          if (!Options._.config.excludeCMD.includes(dataJson.cmd)) {
+            Options._.config.excludeCMD.push(dataJson.cmd)
+            tools.Log(JSON.stringify(dataJson))
+            DanmuLib.add(dataJson)
+          }
+        })
+        .on('DMerror', () => this._DMErrorCount++)
+        .Connect({ server: 'broadcastlv.chat.bilibili.com', port: 2243 })
     this.liveRoomList.set(roomID, commentClient)
   }
   /**
@@ -330,6 +332,35 @@ class RoomListener extends EventEmitter {
     this.emit(`beatStorm${source}`, beatStormMessage)
   }
   /**
+   * 监听天选时刻信息
+   *
+   * @private
+   * @param {ANCHOR_LOT_START} dataJson
+   * @param {'' | '2'} source
+   * @memberof RoomListener
+   */
+  private _AnchorLotStartHandler(dataJson: ANCHOR_LOT_START, source: '' | '2' = '') {
+    if (dataJson.data === undefined || dataJson.data.id === undefined) return
+    const anchorMessage: anchorMessage = {
+      cmd: 'anchor',
+      roomID: dataJson._roomid,
+      id: +dataJson.data.id,
+      award_num: +dataJson.data.award_num,
+      award_name: dataJson.data.id,
+      danmu: dataJson.data.danmu,
+      gift_id: +dataJson.data.gift_id,
+      gift_name: dataJson.data.gift_name,
+      gift_num: +dataJson.data.gift_num,
+      gift_price: +dataJson.data.gift_price,
+      require_type: +dataJson.data.require_type,
+      require_value: +dataJson.data.require_value,
+      type: 'anchor',
+      title: '天选时刻',
+      time: +dataJson.data.time
+    }
+    this.emit(`anchor${source}`, anchorMessage)
+  }
+  /**
    * 写入数据库
    *
    * @param {number} roomID
@@ -385,7 +416,7 @@ interface allRooms {
 }
 interface allRoomsData {
   uid: number
-  roomid: number 
+  roomid: number
 }
 
 export default RoomListener

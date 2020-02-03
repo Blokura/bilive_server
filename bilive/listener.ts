@@ -41,7 +41,23 @@ class Listener extends EventEmitter {
    */
   private _beatStormID: Set<number> = new Set()
   private _dailyBeatStormID: Set<number> = new Set()
+  /**
+   * PK大乱斗ID
+   *
+   * @private
+   * @type {Set<number>}
+   * @memberof Listener
+   */
   private _pklotteryID: Set<number> = new Set()
+  /**
+   * 节奏风暴ID
+   *
+   * @private
+   * @type {Set<number>}
+   * @memberof Listener
+   */
+  private _anchorID: Set<number> = new Set()
+  private _dailyAnchorID: Set<number> = new Set()
   /**
    * 房间监听
    *
@@ -74,16 +90,18 @@ class Listener extends EventEmitter {
   public Start() {
     this._RoomListener = new RoomListener()
     this._RoomListener
-      .on('SYS_MSG', dataJson => this._RaffleCheck(dataJson))
-      .on('SYS_GIFT', dataJson => this._RaffleCheck(dataJson))
-      .on('raffle', (raffleMessage: raffleMessage) => this._RaffleHandler(raffleMessage))
-      .on('lottery', (lotteryMessage: lotteryMessage) => this._RaffleHandler(lotteryMessage))
-      .on('pklottery', (lotteryMessage: lotteryMessage) => this._RaffleHandler(lotteryMessage))
-      .on('beatStorm', (beatStormMessage: beatStormMessage) => this._RaffleHandler(beatStormMessage))
-      .on('lottery2', (lotteryMessage: lotteryMessage) => this._RaffleHandler2(lotteryMessage))
-      .on('pklottery2', (lotteryMessage: lotteryMessage) => this._RaffleHandler(lotteryMessage))
-      .on('beatStorm2', (beatStormMessage: beatStormMessage) => this._RaffleHandler2(beatStormMessage))
-      .Start()
+        .on('SYS_MSG', dataJson => this._RaffleCheck(dataJson))
+        .on('SYS_GIFT', dataJson => this._RaffleCheck(dataJson))
+        .on('anchor', (anchorMessage: anchorMessage) => this._RaffleHandler(anchorMessage))
+        .on('raffle', (raffleMessage: raffleMessage) => this._RaffleHandler(raffleMessage))
+        .on('lottery', (lotteryMessage: lotteryMessage) => this._RaffleHandler(lotteryMessage))
+        .on('pklottery', (lotteryMessage: lotteryMessage) => this._RaffleHandler(lotteryMessage))
+        .on('beatStorm', (beatStormMessage: beatStormMessage) => this._RaffleHandler(beatStormMessage))
+        .on('anchor2', (anchorMessage: anchorMessage) => this._RaffleHandler2(anchorMessage))
+        .on('lottery2', (lotteryMessage: lotteryMessage) => this._RaffleHandler2(lotteryMessage))
+        .on('pklottery2', (lotteryMessage: lotteryMessage) => this._RaffleHandler(lotteryMessage))
+        .on('beatStorm2', (beatStormMessage: beatStormMessage) => this._RaffleHandler2(beatStormMessage))
+        .Start()
     Options.on('dbTimeUpdate', () => this._RoomListener._AddDBRoom())
     Options.on('globalFlagUpdate', () => this._RoomListener._RefreshLiveRoomListener())
   }
@@ -96,6 +114,7 @@ class Listener extends EventEmitter {
     this._dailyBeatStormID.clear()
     this._dailyRaffleID.clear()
     this._dailyLotteryID.clear()
+    this._dailyAnchorID.clear()
   }
   /**
    * 计算遗漏数量
@@ -147,6 +166,7 @@ class Listener extends EventEmitter {
     logMsg += `共监听到raffle抽奖数：${this._raffleID.size}(${this._dailyRaffleID.size})\n`
     logMsg += `共监听到lottery抽奖数：${this._lotteryID.size}(${this._dailyLotteryID.size})\n`
     logMsg += `共监听到beatStorm抽奖数：${this._beatStormID.size}(${this._dailyBeatStormID.size})\n`
+	logMsg += `共监听到anchor抽奖数：${this._anchorID.size}(${this._dailyAnchorID.size})\n`
     logMsg += `raffle漏监听：${raffleMiss}(${raffleMissRate.toFixed(1)}%)\n`
     logMsg += `lottery漏监听：${lotteryMiss}(${lotteryMissRate.toFixed(1)}%)\n`
     logMsg += `今日raffle漏监听：${dailyRaffleMiss}(${dailyRaffleMissRate.toFixed(1)}%)\n`
@@ -159,6 +179,7 @@ class Listener extends EventEmitter {
     pushMsg += `- 共监听到raffle抽奖数：${this._raffleID.size}(${this._dailyRaffleID.size})\n`
     pushMsg += `- 共监听到lottery抽奖数：${this._lotteryID.size}(${this._dailyLotteryID.size})\n`
     pushMsg += `- 共监听到beatStorm抽奖数：${this._beatStormID.size}(${this._dailyBeatStormID.size})\n`
+	pushMsg += `- 共监听到anchor抽奖数：${this._anchorID.size}(${this._dailyAnchorID.size})\n`
     pushMsg += `- raffle漏监听：${raffleMiss}(${raffleMissRate.toFixed(1)}%)\n`
     pushMsg += `- lottery漏监听：${lotteryMiss}(${lotteryMissRate.toFixed(1)}%)\n`
     pushMsg += `- 今日raffle漏监听：${dailyRaffleMiss}(${dailyRaffleMissRate.toFixed(1)}%)\n`
@@ -184,7 +205,7 @@ class Listener extends EventEmitter {
     }
     const lotteryInfo = await tools.XHR<lotteryInfo>(_lotteryInfo, 'Android')
     if (lotteryInfo !== undefined && lotteryInfo.response.statusCode === 200
-      && lotteryInfo.body.code === 0 && lotteryInfo.body.data.gift_list.length > 0) {
+        && lotteryInfo.body.code === 0 && lotteryInfo.body.data.gift_list.length > 0) {
       lotteryInfo.body.data.gift_list.forEach(data => {
         const message: message = {
           cmd: 'raffle',
@@ -204,10 +225,10 @@ class Listener extends EventEmitter {
    * 监听抽奖消息
    *
    * @private
-   * @param {raffleMessage | lotteryMessage | beatStormMessage} raffleMessage
+   * @param {raffleMessage | lotteryMessage | beatStormMessage | anchorMessage} raffleMessage
    * @memberof Listener
    */
-  private _RaffleHandler(raffleMessage: raffleMessage | lotteryMessage | beatStormMessage) {
+  private _RaffleHandler(raffleMessage: raffleMessage | lotteryMessage | beatStormMessage | anchorMessage) {
     const { cmd, id, roomID } = raffleMessage
     switch (cmd) {
       case 'raffle':
@@ -229,6 +250,11 @@ class Listener extends EventEmitter {
         this._beatStormID.add(id)
         this._dailyBeatStormID.add(id)
         break
+      case 'anchor':
+        if (this._anchorID.has(id)) return
+        this._anchorID.add(id)
+        this._dailyAnchorID.add(id)
+        break
       default:
         return
     }
@@ -244,7 +270,7 @@ class Listener extends EventEmitter {
    * @param {lotteryMessage | beatStormMessage} raffleMessage
    * @memberof Listener
    */
-  private _RaffleHandler2(lotteryMessage: lotteryMessage | beatStormMessage) {
+  private _RaffleHandler2(lotteryMessage: lotteryMessage | beatStormMessage | anchorMessage) {
     const { cmd, id, roomID } = lotteryMessage
     switch (cmd) {
       case 'lottery':
@@ -260,6 +286,11 @@ class Listener extends EventEmitter {
         if (this._beatStormID.has(id)) return
         this._beatStormID.add(id)
         this._dailyBeatStormID.add(id)
+        break
+      case 'anchor':
+        if (this._anchorID.has(id)) return
+        this._anchorID.add(id)
+        this._dailyAnchorID.add(id)
         break
       default: return
     }

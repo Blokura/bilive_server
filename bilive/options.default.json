@@ -26,7 +26,8 @@
     "raffle": false,
     "lottery": false,
     "pklottery": false,
-    "beatStorm": false
+    "beatStorm": false,
+    "anchor": false
   },
   "info": {
     "dbTime": {
@@ -112,6 +113,11 @@
     "beatStorm": {
       "description": "节奏风暴抽奖",
       "tip": "是否向该用户组发送节奏风暴抽奖消息",
+      "type": "boolean"
+    },
+    "anchor": {
+      "description": "天选时刻抽奖",
+      "tip": "是否向该用户组发送天选时刻抽奖消息",
       "type": "boolean"
     },
     "protocol": {

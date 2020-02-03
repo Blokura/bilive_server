@@ -740,6 +740,43 @@ interface SPECIAL_GIFT_data_beatStorm_end {
   action: 'end'
 }
 /**
+ * 天选时刻信息
+ * {"cmd":"ANCHOR_LOT_START","data":{"asset_icon":"https://i0.hdslb.com/bfs/live/992c2ccf88d3ea99620fb3a75e672e0abe850e9c.png","award_image":"","award_name":"红包10元","award_num":1,"cur_gift_num":0,"current_time":1575031357,"danmu":"哔哩哔哩干杯","gift_id":20004,"gift_name":"吃瓜","gift_num":5,"gift_price":100,"goaway_time":180,"id":6569,"join_type":1,"lot_status":0,"max_time":600,"require_text":"关注主播","require_type":1,"require_value":0,"room_id":101526,"show_panel":1,"status":1,"time":599,"url":"https://live.bilibili.com/p/html/live-lottery/anchor-join.html?is_live_half_webview=1&hybrid_biz=live-lottery-anchor&hybrid_half_ui=1,5,100p,100p,000000,0,30,0,0,1;2,5,100p,100p,000000,0,30,0,0,1;3,5,100p,100p,000000,0,30,0,0,1;4,5,100p,100p,000000,0,30,0,0,1;5,5,100p,100p,000000,0,30,0,0,1;6,5,100p,100p,000000,0,30,0,0,1;7,5,100p,100p,000000,0,30,0,0,1;8,5,100p,100p,000000,0,30,0,0,1"},"_roomid":101526}
+ *
+ * @interface ANCHOR_LOT_START
+ */
+interface ANCHOR_LOT_START extends danmuJson {
+  data: ANCHOR_LOT_START_data
+}
+interface ANCHOR_LOT_START_data {
+  /** 抽奖编号 */
+  id: string
+  /** 奖品名称 */
+  award_name: string
+  /** 奖品数量 */
+  award_num: number
+  /** 弹幕信息 */
+  danmu: string
+  /** 送礼ID */
+  gift_id: number
+  /** 礼物名称 */
+  gift_name: string
+  /** 送礼数量 */
+  gift_num: number
+  /** 礼物价格 */
+  gift_price: number
+  /** 持续时间 */
+  max_time: number
+  /** 抽奖需求 */
+  require_type: number
+  /** 需求值 */
+  require_value: number
+  /** 房间号 */
+  room_id: number
+  /** 剩余时间 */
+  time: number
+}
+/**
  * 准备直播, 下播
  * {"cmd":"PREPARING","round":1,"roomid":"66287","_roomid":66287}
  *

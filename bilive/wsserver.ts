@@ -78,26 +78,26 @@ class WSServer {
       }
     })
     this._wsServer
-      .on('error', error => tools.ErrorLog('websocket', error))
-      .on('connection', (client: ws, req: http.IncomingMessage) => {
-        // 使用Nginx可能需要
-        const remoteAddress = req.headers['x-real-ip'] === undefined
-          ? `${req.connection.remoteAddress}:${req.connection.remotePort}`
-          : `${req.headers['x-real-ip']}:${req.headers['x-real-port']}`
-        const useragent = req.headers['user-agent']
-        const protocol = client.protocol
-        const adminProtocol = Options._.server.protocol
-        let user: string
-        if (protocol === adminProtocol) {
-          user = '管理员'
-          this._AdminConnectionHandler(client, remoteAddress)
-        }
-        else {
-          user = `用户: ${client.protocol}`
-          this._WsConnectionHandler(client, remoteAddress)
-        }
-        tools.Log(`${user} 地址: ${remoteAddress} 已连接. user-agent: ${useragent}`)
-      })
+        .on('error', error => tools.ErrorLog('websocket', error))
+        .on('connection', (client: ws, req: http.IncomingMessage) => {
+          // 使用Nginx可能需要
+          const remoteAddress = req.headers['x-real-ip'] === undefined
+              ? `${req.connection.remoteAddress}:${req.connection.remotePort}`
+              : `${req.headers['x-real-ip']}:${req.headers['x-real-port']}`
+          const useragent = req.headers['user-agent']
+          const protocol = client.protocol
+          const adminProtocol = Options._.server.protocol
+          let user: string
+          if (protocol === adminProtocol) {
+            user = '管理员'
+            this._AdminConnectionHandler(client, remoteAddress)
+          }
+          else {
+            user = `用户: ${client.protocol}`
+            this._WsConnectionHandler(client, remoteAddress)
+          }
+          tools.Log(`${user} 地址: ${remoteAddress} 已连接. user-agent: ${useragent}`)
+        })
     this._loop = setInterval(() => this._WebSocketPing(), 60 * 1000)
   }
   /**
@@ -114,21 +114,21 @@ class WSServer {
     // 使用function可能出现一些问题, 此处无妨
     const onLog = (data: string) => this._sendtoadmin({ cmd: 'log', ts: 'log', msg: data })
     client
-      .on('error', err => {
-        tools.removeListener('log', onLog)
-        this._destroyClient(client)
-        tools.ErrorLog(client.protocol, remoteAddress, err)
-      })
-      .on('close', (code, reason) => {
-        tools.removeListener('log', onLog)
-        this._destroyClient(client)
-        tools.Log(`管理员 地址: ${remoteAddress} 已断开`, code, reason)
-      })
-      .on('message', async (msg: string) => {
-        const message = await tools.JSONparse<message>(B64XorCipher.decode(Options._.server.netkey || '', msg))
-        if (message !== undefined && message.cmd !== undefined && (<adminMessage>message).ts !== undefined) this._onCMD(<adminMessage>message)
-        else this._sendtoadmin({ cmd: 'error', ts: 'error', msg: '消息格式错误' })
-      })
+        .on('error', err => {
+          tools.removeListener('log', onLog)
+          this._destroyClient(client)
+          tools.ErrorLog(client.protocol, remoteAddress, err)
+        })
+        .on('close', (code, reason) => {
+          tools.removeListener('log', onLog)
+          this._destroyClient(client)
+          tools.Log(`管理员 地址: ${remoteAddress} 已断开`, code, reason)
+        })
+        .on('message', async (msg: string) => {
+          const message = await tools.JSONparse<message>(B64XorCipher.decode(Options._.server.netkey || '', msg))
+          if (message !== undefined && message.cmd !== undefined && (<adminMessage>message).ts !== undefined) this._onCMD(<adminMessage>message)
+          else this._sendtoadmin({ cmd: 'error', ts: 'error', msg: '消息格式错误' })
+        })
     this._adminClient = client
     // 日志
     tools.on('log', onLog)
@@ -160,21 +160,21 @@ class WSServer {
       }, 2 * 60 * 1000)
     }
     client
-      .on('error', err => {
-        this._destroyClient(client)
-        tools.ErrorLog(protocol, remoteAddress, err)
-      })
-      .on('close', (code, reason) => {
-        this._destroyClient(client)
-        const clients = <Set<ws>>this._clients.get(protocol)
-        clients.delete(client)
-        if (clients.size === 0) this._clients.delete(protocol)
-        tools.Log(`用户: ${protocol} 地址: ${remoteAddress} 已断开`, code, reason)
-      })
-      .on('pong', () => {
-        clearTimeout(timeout)
-        setTimeoutError()
-      })
+        .on('error', err => {
+          this._destroyClient(client)
+          tools.ErrorLog(protocol, remoteAddress, err)
+        })
+        .on('close', (code, reason) => {
+          this._destroyClient(client)
+          const clients = <Set<ws>>this._clients.get(protocol)
+          clients.delete(client)
+          if (clients.size === 0) this._clients.delete(protocol)
+          tools.Log(`用户: ${protocol} 地址: ${remoteAddress} 已断开`, code, reason)
+        })
+        .on('pong', () => {
+          clearTimeout(timeout)
+          setTimeoutError()
+        })
     setTimeoutError()
     // 连接成功消息
     const welcome: message = {
@@ -259,6 +259,16 @@ class WSServer {
     this._Broadcast(lotteryMessage, 'pklottery', protocol)
   }
   /**
+   * 天选时刻抽奖
+   *
+   * @param {anchorMessage} anchorMessage
+   * @param {string} [protocol]
+   * @memberof WSServer
+   */
+  public Anchor(anchorMessage: message, protocol?: string) {
+    this._Broadcast(anchorMessage, 'anchor', protocol)
+  }
+  /**
    * 广播消息
    *
    * @private
@@ -288,19 +298,19 @@ class WSServer {
   private async _onCMD(message: adminMessage) {
     const { cmd, ts } = message
     switch (cmd) {
-      // 获取log
+        // 获取log
       case 'getLog': {
         const data = tools.logs
         this._sendtoadmin({ cmd, ts, data })
       }
         break
-      // 获取设置
+        // 获取设置
       case 'getConfig': {
         const data = Options._.config
         this._sendtoadmin({ cmd, ts, data })
       }
         break
-      // 保存设置
+        // 保存设置
       case 'setConfig': {
         const config = Options._.config
         const sysmsg = config.sysmsg
@@ -327,7 +337,7 @@ class WSServer {
         else this._sendtoadmin({ cmd, ts, msg, data: config })
       }
         break
-      // 修改密钥
+        // 修改密钥
       case 'setNewNetkey': {
         const server = Options._.server
         const config = <any>message.data || {}
@@ -336,19 +346,19 @@ class WSServer {
         this._sendtoadmin({ cmd, ts })
       }
         break
-      // 获取参数描述
+        // 获取参数描述
       case 'getInfo': {
         const data = Options._.info
         this._sendtoadmin({ cmd, ts, data })
       }
         break
-      // 获取uid
+        // 获取uid
       case 'getAllUID': {
         const data = Object.keys(Options._.user)
         this._sendtoadmin({ cmd, ts, data })
       }
         break
-      // 获取用户设置
+        // 获取用户设置
       case 'getUserData': {
         const user = Options._.user
         const getUID = message.uid
@@ -356,7 +366,7 @@ class WSServer {
         else this._sendtoadmin({ cmd, ts, msg: '未知用户' })
       }
         break
-      // 保存用户设置
+        // 保存用户设置
       case 'setUserData': {
         const user = Options._.user
         const setUID = message.uid
@@ -390,7 +400,7 @@ class WSServer {
         else this._sendtoadmin({ cmd, ts, uid: setUID, msg: '未知用户' })
       }
         break
-      // 删除用户设置
+        // 删除用户设置
       case 'delUserData': {
         const user = Options._.user
         const delUID = message.uid
@@ -409,7 +419,7 @@ class WSServer {
         else this._sendtoadmin({ cmd, ts, uid: delUID, msg: '未知用户' })
       }
         break
-      // 新建用户设置
+        // 新建用户设置
       case 'newUserData': {
         // 虽然不能保证唯一性, 但是这都能重复的话可以去买彩票
         const uid = randomBytes(16).toString('hex')
@@ -420,7 +430,7 @@ class WSServer {
         this._sendtoadmin({ cmd, ts, uid, data })
       }
         break
-      // 未知命令
+        // 未知命令
       default:
         this._sendtoadmin({ cmd, ts, msg: '未知命令' })
         break
