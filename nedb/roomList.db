@@ -15997,4 +15997,4 @@
 {"_id":"zzlWF10d4xgK095F","roomID":7384143,"raffle":7,"masterID":262632476,"beatStorm":9,"smallTV":2,"updateTime":1552140769350,"lottery":3}
 {"$$indexCreated":{"fieldName":"updateTime","unique":false,"sparse":false}}
 {"$$indexCreated":{"fieldName":"roomID","unique":false,"sparse":false}}
-{"roomID":21357874,"raffle":9,"masterID":358317342,"updateTime":1584331195654,"_id":"xwmBo8F0cBSenoqE","lottery":50,"beatStorm":16,"smallTV":1,"anchor":32}
+{"_id":"Qxumx0lVXW9yEdFH","roomID":43001,"beatStorm":1386,"smallTV":689,"raffle":1510,"masterID":4677463,"updateTime":1584417593724,"lottery":533,"pklottery":25,"anchor":2}
